@@ -6,7 +6,7 @@ logged_in = False
 while True:
     if not logged_in:
         input("Username: ")
-        input("Password: ") 
+
         
     command = input("> ")
     

@@ -23,16 +23,26 @@ class Scraper:
     
     
     def get_content(self, page):
+        """Parses and returns a beautified version of the given web page's HTML content"""
         soup = BeautifulSoup(page.content, 'html.parser')
         page = BeautifulSoup(soup.prettify(), 'html.parser')
         return page
     
-    def extract_info()
+    
+    def extract_info(self, content):
+        """Extracts the product title and price of the product from the HTML"""
+        title = content.find(id="productTitle").get_text().strip()
+        whole_price = content.find(class_ = "a-price-whole").get_text()
+        whole_price = whole_price.split('.')[0].strip()
+        fraction_price = content.find(class_ = "a-price-fraction").get_text().strip()
+        final_price = str(whole_price) + '.' + str(fraction_price)
+        today = datetime.date.today()
+        
+        return (title, final_price, today)
     
     
     def scrape(self, URL):
-        
-        #Getting a response from the page
+        """Takes a URL of the product page and returns information about the product"""
         try:
             page = requests.get(URL)
         except:
@@ -41,21 +51,13 @@ class Scraper:
         #Extracting the HTML in a 'prettified' format'
         content = self.get_content(page)
         
-        #Getting the name and price of the product from the page.
-        title = content.find(id="productTitle").get_text().strip()
-        whole_price = content.find(class_ = "a-price-whole").get_text()
-        whole_price = whole_price.split('.')[0].strip()
-        fraction_price = content.find(class_ = "a-price-fraction").get_text().strip()
-        final_price = str(whole_price) + '.' + str(fraction_price)
-    
-        #Getting today's date
-        today = datetime.date.today()
+      
         
-        return (title, final_price, today)
+        return self.extract_info(content)
         
         
 
-    def already_visited(self, title):
+    def already_visited(self, title, current_user = None):
         df = pd.read_csv(r'visited_products.csv')
         value_exists = df['Title'].isin([title]).any()
         return value_exists
@@ -63,23 +65,21 @@ class Scraper:
         
 
     def newEntry(self, URL):
-        
         #Obtaining the name, price and date_viewed of the product
         title, final_price, today = self.scrape(URL)
         data = [title, final_price, today]
         
         if not self.already_visited(title):
-            #Adding it to the list of viewed products
             with open('visited_products.csv', 'a+', newline='\n', encoding = 'UTF8') as f:
                 writer = csv.writer(f)
                 writer.writerow(data)
             
+        
         df = pd.read_csv(r'visited_products.csv')
         print(df)
         
         
-new_scraper = Scraper()
-Scraper.newEntry()
+
 
 
 
