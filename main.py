@@ -6,26 +6,15 @@ import csv
 import smtplib
 import pandas as pd
 import sqlite3
+
+
 from data_classes import *
+from exceptions import *
 
 
 from typing import Tuple
 
 
-
-class WebsiteNotFound(Exception):
-    """Custom exception class for when there is no website that matches a passed URL"""
-
-    def __init__(self, message="The URL does not match any website", URL = None):
-        super().__init__(message)
-        self.faulty_URL = URL
-
-
-class ProductDoesNotExist(Exception):
-    def __init__(self, faulty_code):
-        message = f"Product #{faulty_code} does not exist"
-        super().__init__(message)
-        self.code = faulty_code
         
         
 
@@ -61,6 +50,7 @@ class Scraper:
         
         #Extracting the HTML in a 'prettified' format'
         content : BeautifulSoup = self.get_content(page)
+        
         #Extracting and returning product info from the HTML
         return self.extract_info(content)
         
@@ -87,11 +77,11 @@ class Modifier:
         self.current_user: User = active_user
     
     def new_user(self, username: str):
-        """Creates new user with the currrent loggedin user as the master"""
+        """Creates new user with the current loggedin user as the master"""
         self.current_user.create_new_user(username)
         
     def create_entry(self, title: str, final_price: float, today: datetime.date(), rating: int):
-        product : Product = Product.create_new(title, final_price, today, self.current_user, rating)
+        product: Product = Product.create_new(title, final_price, today, self.current_user, rating)
             
     
     def new_product(self, URL : str, rating: int):
@@ -102,9 +92,10 @@ class Modifier:
         
     def find_product(self, product_code: int) -> Product:
         #takes product code and returns product object
+        query = "SELECT * FROM products WHERE id = ?"
+        
         with sqlite3.connect('database.db') as conn:  # This will create a file named 'database.db'
             cursor = conn.cursor()
-            query = "SELECT * FROM products WHERE id = ?"
             cursor.execute(query, (product_code, ))
             results = cursor.fetchall()
             
