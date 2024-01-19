@@ -10,7 +10,8 @@ cursor = conn.cursor()
 cursor.execute('''
     CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL
+        name TEXT NOT NULL,
+        master INTEGER REFERENCES users(id) CHECK (master != id)
     )
 ''')
 
@@ -20,12 +21,12 @@ cursor.execute('''
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         price REAL NOT NULL,
-        bought INTEGER NOT NULL CHECK (bought IN (0, 1)),
+        bought INTEGER NOT NULL DEFAULT 0 CHECK (bought IN (0, 1)),
         user_id INTEGER,
         rating INTEGER CHECK (rating >= 1 AND rating <= 10),
         FOREIGN KEY (user_id) REFERENCES Users(id)
     )
-''')
+    ''')
 
 
 # Commit the changes
