@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+#External imports
 import time
 import datetime
 import csv
@@ -7,15 +8,24 @@ import smtplib
 import pandas as pd
 import sqlite3
 
-
+#Internal
 from data_classes import *
-from exceptions import *
+from exceptions import *  #Notice how main.py imports from data_classes but not the other way around to prevent circular imports
 
 
-from typing import Tuple
+#Typing related imports
+from typing import List, Tuple
 
 
-        
+def print_SQL_records(func):
+    """A decorator"""
+    def wrapper(self, *args, **kwargs):
+        records_list = func(self, *args, **kwargs)
+        for record in records_list:
+            str_tuple = tuple(map(str, record))
+            print_string = " ".join(str_tuple)
+            print(print_string)
+    return wrapper
         
 
 class Scraper:
@@ -48,7 +58,7 @@ class Scraper:
         except:
             raise WebsiteNotFound()
         
-        #Extracting the HTML in a 'prettified' format'
+        #Extracting the HTML in a 'prettified' format
         content : BeautifulSoup = self.get_content(page)
         
         #Extracting and returning product info from the HTML
@@ -71,7 +81,7 @@ class Scraper:
 
 
 class Modifier:
-    """The objects of this class are used to modify the database"""
+    """The objects of this class are used to modify the database accordinng to the user in-session and their entries"""
     
     def __init__(self, active_user: User):
         self.current_user: User = active_user
@@ -118,6 +128,19 @@ class Modifier:
     def buy(self, product_code: int):
         product = self.find_product(product_code)
         product.buy()
+        
+    @print_SQL_records
+    def list_products(self, bought: bool = None) -> List[Tuple[int, str, float, int, int, int]]:
+        product_list = Product.list_products(self.current_user.id, bought)
+        return product_list
+
+    
+            
+        
+        
+            
+            
+            
         
         
         

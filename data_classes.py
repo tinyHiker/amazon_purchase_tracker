@@ -3,29 +3,29 @@ import datetime
 
 from exceptions import *
 
+from typing import Optional
 
 class AlreadyBought(Exception):
+    """Raised when a customer tries to buy a product that is already bought"""
     def __init__(self):
         message = f"You have already bought this product"
         super().__init__(message)
     
         
 class User:
-    def __init__(self, id, name, master):
+    def __init__(self, id: int, name: str, master):
         self.id = id
         self.name = name
         self.master = master
         
         
-    def create_new_user(self, user_name):
+    def create_new_user(self, user_name : str):
         query = "INSERT INTO users (name, master) VALUES (?, ?)"
         with sqlite3.connect('database.db') as conn:
             cursor = conn.cursor()
             cursor.execute(query, (user_name, self.id))
             conn.commit()
             
-        
-        
         
 class Product:
     def __init__(self, *args):
@@ -37,8 +37,9 @@ class Product:
         self.user_id: int = args[4]
         self.rating: int = args[5] #Should be between 1 and 10 inclusive
     
+    
     @staticmethod
-    def create_new(title: str, final_price: float, date: datetime.date, user: User, rating: int ):
+    def create_new(title: str, final_price: float, date: datetime.date, user: User, rating: int):
         #Create new_entry using SQL
         query = "INSERT INTO products (name, price, user_id, rating) VALUES (?, ?, ?, ?)"
         
@@ -65,7 +66,7 @@ class Product:
         return True
                 
     
-    def change_rating(self, score):
+    def change_rating(self, score: int):
         #updates rating in the database for this object
         self.rating = score 
         query = "UPDATE products SET rating = ? WHERE id = ?"
@@ -87,5 +88,23 @@ class Product:
                 conn.commit()
         else:
             raise AlreadyBought()
-
+    
+    
+    @staticmethod
+    def list_products(user_id: int, bought_lookup: Optional[bool] = None):
+        with sqlite3.connect('database.db') as conn:  # This will create a file named 'database.db'
+            cursor = conn.cursor()
+            if bought_lookup is None:
+                query = "SELECT * FROM products WHERE user_id = ?"
+                cursor.execute(query, (user_id, ))
+            elif bought_lookup == False:
+                query = "SELECT * FROM products WHERE user_id = ? AND bought = ?"
+                cursor.execute(query, (user_id, 0))
+            else:
+                query = "SELECT * FROM products WHERE user_id = ? AND bought = ?"
+                cursor.execute(query, (user_id, 1))
+                
+            results = cursor.fetchall()
+        
+        return results
        
