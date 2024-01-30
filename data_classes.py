@@ -13,7 +13,7 @@ class AlreadyBought(Exception):
     
         
 class User:
-    def __init__(self, id: int, name: str, master):
+    def __init__(self, id: int, name: str, master: int):
         self.id = id
         self.name = name
         self.master = master

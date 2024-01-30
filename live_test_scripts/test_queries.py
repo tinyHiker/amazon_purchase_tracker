@@ -1,7 +1,9 @@
+"""This python script test my SQL queries using an in-memory/RAM database"""
+
 import sqlite3
 
 # Connect to a database (or create if it doesn't exist)
-conn = sqlite3.connect('live_test_scripts/test_database.db')  # This will create a file named 'my_database.db'
+conn = sqlite3.connect(':memory:')  # This will create a file named 'my_database.db'
 
 # Create a cursor object
 cursor = conn.cursor()
@@ -47,15 +49,15 @@ product_data = [
 cursor.executemany("INSERT INTO products (name, price, user_id, rating) VALUES (?, ?, ?, ?)", product_data)
 
 
-query = "SELECT * FROM products"
+query = "SELECT * FROM products WHERE user_id=20"
 cursor.execute(query)
 
 # Fetch all rows from the query result
 products = cursor.fetchall()
 
 print(products)
-print(type(products[1][2]))
-# Commit the changes
+
+
 conn.commit()
 
 # Close the connection

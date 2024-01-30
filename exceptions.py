@@ -1,5 +1,5 @@
 class AlreadyBought(Exception):
-    def __init__(self):
+    def __init__(self, product_id):
         message = f"You have already bought this product"
         super().__init__(message)
        
@@ -17,3 +17,10 @@ class ProductDoesNotExist(Exception):
         message = f"Product #{faulty_code} does not exist"
         super().__init__(message)
         self.code = faulty_code
+        
+class UserDoesNotExist(Exception):
+    def __init__(self, wrong_name):
+        message = f"User '{wrong_name}' does not exist"
+        super().__init__(message)
+        self.wrong_name = wrong_name
+        

@@ -1,0 +1,11 @@
+Obviously buy() method is getting in the way of the count method. THink of a solution to this. 
+
+Seperate Scaper class into a different file
+
+Give Scraper class __name__ == ""__main__" functionality as post that as the Amazon Web Scraper for now.
+
+Get some images of the product page, the inspect bar and your output
+
+Should I make it so that buying a product automatically deletes it? The system become a tool for users to track what htye want to buy
+
+or I can go with the number count idea
