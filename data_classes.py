@@ -13,7 +13,7 @@ class AlreadyBought(Exception):
     
         
 class User:
-    def __init__(self, id: int, name: str, master: int):
+    def __init__(self, id: int, name: str, master: Optional[int] = None):
         self.id = id
         self.name = name
         self.master = master
@@ -25,6 +25,11 @@ class User:
             cursor = conn.cursor()
             cursor.execute(query, (user_name, self.id))
             conn.commit()
+            new_user_id = cursor.lastrowid
+            
+        return User(id=new_user_id, name=user_name, master=self.id)
+            
+        
             
         
 class Product:

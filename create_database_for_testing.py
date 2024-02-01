@@ -28,6 +28,23 @@ cursor.execute('''
     )
     ''')
 
+user_name = "Taha"  # Example user name
+cursor.execute("INSERT INTO users (name) VALUES (?)", (user_name,))
+
+# Get the last inserted user's ID
+user_id = cursor.lastrowid
+
+# Insert products related to the user into the 'products' table
+products = [
+    ("Widget", 19.99, 0, 8),
+    ("Gadget", 29.99, 1, 9)
+]
+
+for product in products:
+    cursor.execute("INSERT INTO products (name, price, bought, user_id, rating) VALUES (?, ?, ?, ?, ?)",
+                   (product[0], product[1], product[2], user_id, product[3]))
+
+
 
 # Commit the changes
 conn.commit()

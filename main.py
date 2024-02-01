@@ -18,6 +18,10 @@ from scraper import *
 from typing import List, Tuple, Optional
 
 
+def login(user_name):
+    return Checker.extract_user(user_name)
+    
+
 def print_SQL_records(func):
     """A decorator that print all the return records from a function"""
     def wrapper(self, *args, **kwargs):
@@ -35,7 +39,7 @@ class Checker:
     def __init__(self, active_user: User):
         self.current_user: User = active_user
         
-    def check_product_already_visited(self, name: str) -> bool:
+    def check_product_not_visited(self, name: str) -> bool:
         """Returns True if the active user has already logged this product"""
         with sqlite3.connect('database.db') as conn:  
             cursor = conn.cursor()
@@ -43,7 +47,7 @@ class Checker:
             cursor.execute(query, (name, self.current_user.id))
             results = cursor.fetchall()
         if len(results) > 0:
-            raise AlreadyBought(results[0][0]) #Passing the id of the already bought product into the exception so that its buy-count can be incremented later on.
+            raise AlreadyBoughtException(results[0][0]) #Passing the id of the already bought product into the exception so that its buy-count can be incremented later on.
         return True
     
     @staticmethod    
@@ -53,12 +57,16 @@ class Checker:
         with sqlite3.connect('database.db') as conn:  
             cursor = conn.cursor()
             query = "SELECT * FROM users WHERE name = ?" #Query to get all users with a certain. Running this query should only return a list of ONE OR ZERO users
-            cursor.execute(query, (user_name))
+            cursor.execute(query, (user_name, ))
             results = cursor.fetchall()
         if len(results) == 0:
             raise UserDoesNotExist(user_name) #Passing the id of the already bought product into the exception so that its buy-count can be incremented later on.
         else:
-            return Modifier.create_user_object(*results[0])
+            return Modifier.create_user_object(results[0][0], results[0][1], results[0][2])
+        
+    @staticmethod
+    def check_rating(rating: int) -> bool:
+        return rating >= 1 and rating <= 10
         
 
 class Modifier:
@@ -71,25 +79,30 @@ class Modifier:
         """Creates new user with the current loggedin user as the master"""
         try:
             Checker.extract_user(username) #Should raise UserDoesNotExist
-            print('A user with this username already exists')
+            raise UserAlreadyExists(username)
         except UserDoesNotExist:
-            self.current_user.create_new_user(username) #Creates a new user with the new username if a user with that username does not already exist
+            new_user: User = self.current_user.create_new_user(username) #Creates a new user with the new username if a user with that username does not already exist
             #Uses a method from the User class and not the Modifier class becuase of 'master' field in SQL
+            return new_user
 
         
     @staticmethod
-    def create_user_object(*user_data):
+    def create_user_object(user_id: int, user_name: str, user_master: Optional[int] = None):
         """Used in Checker classes extract_user() function"""
-        user = User(user_data[0], user_data[1], user_data[2])
-        return User
+        user = User(user_id, user_name, user_master)
+        return user
         
     
-    def enter_SQL_product(self, name: str, final_price: float, today: datetime.date(), rating: int) -> bool: #WE ARE NOT PASSING IN DATE BECUASE THERE IS NOT DATE FIELD IN OUR SLITE DATABASE AT THE MOMENT
+    def enter_SQL_product(self, name: str, final_price: float, today: datetime.date, rating: int) -> bool: #WE ARE NOT PASSING IN DATE BECUASE THERE IS NOT DATE FIELD IN OUR SLITE DATABASE AT THE MOMENT
+        checker = Checker(self.current_user)
+        checker.check_product_not_visited(name)
         product: Product = Product.create_new(name, final_price, today, self.current_user, rating)
         return True
-        #NEED TO ADD check_product_already_visited() from checker class functionality    
+    
     
     def enter_new_product(self, URL : str, rating: int) -> bool:
+        if not Checker.check_rating(rating):
+            raise RatingOutOfBounds(rating)
         scraper = Scraper()
         scraped_data = scraper.scrape(URL)
         self.enter_SQL_product(name = scraped_data[0], final_price = scraped_data[1], today = scraped_data[2], rating = rating)
