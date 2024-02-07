@@ -100,8 +100,8 @@ class Product:
         with sqlite3.connect('database.db') as conn:  # This will create a file named 'database.db'
             cursor = conn.cursor()
             if bought_lookup is None:
-                query = "SELECT * FROM products WHERE user_id = ?"
-                cursor.execute(query, (user_id, ))
+                query = "SELECT * FROM products"
+                cursor.execute(query)
             elif bought_lookup == False:
                 query = "SELECT * FROM products WHERE user_id = ? AND bought = ?"
                 cursor.execute(query, (user_id, 0))

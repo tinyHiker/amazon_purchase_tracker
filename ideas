@@ -9,3 +9,14 @@ Get some images of the product page, the inspect bar and your output
 Should I make it so that buying a product automatically deletes it? The system become a tool for users to track what htye want to buy
 
 or I can go with the number count idea
+
+
+_________
+
+Some more ideas: 
+For the command line testing, we can either:
+1. Create a seperate system just for testing in an isolated folder, where the database is only used for entering test values and command line testing. Might want to add unit testing for this as well. Might want to consider a shell script that deletes databate.db, creates it again, and then runs the test scripts. 
+
+2. Modify the current system to work on a certain database file based on an argument
+
+I feel like number 1 is the better option.

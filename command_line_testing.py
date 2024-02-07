@@ -32,7 +32,7 @@ def print_all_records():
 
 
 
-#TEST #1: Testing login, seeing if a user is returned properly and if I can proerly access its attributes
+#TEST #1: Testing login, seeing if a user is returned properly and if I can properly access its attributes
 print("TEST #1: LOGIN", end ="\n\n\n")
 user = login("Taha")
 print(user)
@@ -41,6 +41,7 @@ print(user.name)
 print(user.master)
 print("\n")
 print("--------------------------------------------------------------------------------------------------------")
+
 
 
 
@@ -55,6 +56,7 @@ print("-------------------------------------------------------------------------
 
 
 
+
 #TEST #3: Testing creation of a new user
 print("TEST #3: TESTING CREATION OF A NEW USER", end ="\n\n\n")
 new_user = modifier.new_user("Joe") 
@@ -64,7 +66,7 @@ print_all_records()  #Finding Joe in the database
 
 try:
     new_user = modifier.new_user("Joe") 
-except UserAlreadyExists as uae:
+except UserAlreadyExists as uae:  #This should be caught
     print(uae)
     
 print("\n")
@@ -101,7 +103,7 @@ print("-------------------------------------------------------------------------
 
 
 
-#TEST 5: Testing the finding of a product
+#TEST 5: TESTING THE FINDING OF THE PRODUCT
 print("TEST #5: TESTING THE FINDING OF A PRODDUCT", end ="\n\n\n")
 found_product = modifier.find_product(3)
 print(found_product)
@@ -118,10 +120,11 @@ print("-------------------------------------------------------------------------
 
 
 
-#TEST 6: TESTING THE DELETION OF PRODUCTS
+#TEST 6: Testing the deletion of a product
 print("TEST #6: TESTING THE DELETION OF PRODUCTS", end ="\n\n\n")
 modifier.delete_product(product_code=3)
 print_all_records()
+
 
 try:
     found_product = modifier.delete_product(3)
@@ -138,7 +141,46 @@ except ProductDoesNotExist as pde:
 print("\n")
 print("--------------------------------------------------------------------------------------------------------")
     
-    
+
+
+
+#TEST 7: Testing the change_rating functionality
+print("TEST #7: TESTING THE CHANGE RATING FUNCTIONALITY", end ="\n\n\n")
+print("\nBEFORE:", end="\n")
+print_all_records()
+modifier.change_rating(1, 2) #Should change "Widget" rating from 9 to 2
+print("\n\nAFTER ['WIDGET' RATING SHOULD NOW BE 2]:", end="\n")
+print_all_records()
+print("\n")
+print("--------------------------------------------------------------------------------------------------------")
+ 
+ 
+ 
+ 
+ 
+ 
+#TEST 8: Testing the list products functionality
+# I NEED TO FIX THE DISPLAY
+print("TEST #8: TESTING THE LIST PRODUCTS FUNCTIONALITY", end ="\n\n\n")
+
+print("\nVIEWING ALL PRODUCTS:", end="\n") 
+#Should show both "Widget" and "Gadget"
+modifier.list_products()
+
+print("\n\nVIEWING ALL UNBOUGHT PRODUCTS:", end="\n")
+#Should show only "Widget"
+modifier.list_products(0)
+
+
+print("\n\nVIEWING ALL BOUGHT PRODUCTS:", end="\n")
+#Should show only "Gadget"
+modifier.list_products(1)
+print("\n")
+print("--------------------------------------------------------------------------------------------------------")
+ 
+
+
+
 
 
 
