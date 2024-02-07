@@ -1,22 +1,22 @@
-Obviously buy() method is getting in the way of the count method. THink of a solution to this. 
+I need to fix the listing of the products Test #8: Command line functionality, probelm, for bought it shows 1
 
-Seperate Scaper class into a different file
+Might want to add a cleanse functionality that allows all bought products of a user to be deleted. Fresh slate
 
-Give Scraper class __name__ == ""__main__" functionality as post that as the Amazon Web Scraper for now.
+Add logging through Modifer class. Will use grep to view all user activity. Make viewing all you activity an option in the user-interface
 
-Get some images of the product page, the inspect bar and your output
+I should be able to dockerize this application pretty easily
+I mean the tutorial deals with pio dependencies, requirements.txt, adding files, and the file you want to run.
+That's all I have in my application, right?
 
-Should I make it so that buying a product automatically deletes it? The system become a tool for users to track what htye want to buy
+keep cmd-testing until you finish the system. Eventually, though, you will have to ditch it. MAKE A COMMIT BEFORE DITCHING IT FOR THE FINAL SYSTEM AND THE FINAL DATABASE. MIGHT BE A BRANCH POINT IN THE FUTURE
 
-or I can go with the number count idea
+when you beleive the main-logic is all done, you start making the user interface. MAKE SURE YOU COMMIT BEFORE STARTING THE USER-INTERFACE.
+MIGHT BE A BRNAHC POINT IN THE FUTURE
 
 
-_________
+I should be able to dockerize this application pretty easily
+I mean the tutorial deals with pio dependencies, requirements.txt, adding files, and the file you want to run.
+That's all I have in my application, right?
 
-Some more ideas: 
-For the command line testing, we can either:
-1. Create a seperate system just for testing in an isolated folder, where the database is only used for entering test values and command line testing. Might want to add unit testing for this as well. Might want to consider a shell script that deletes databate.db, creates it again, and then runs the test scripts. 
+Start user_interface
 
-2. Modify the current system to work on a certain database file based on an argument
-
-I feel like number 1 is the better option.

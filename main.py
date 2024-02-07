@@ -7,6 +7,7 @@ import csv
 import smtplib
 import pandas as pd
 import sqlite3
+from prettytable import PrettyTable
 
 #Internal imports
 from data_classes import *
@@ -31,9 +32,38 @@ def print_SQL_records(func):
             print_string = " ".join(str_tuple)
             print(print_string)
     return wrapper
-        
-     
 
+
+def print_prettified_products_for_user(func):
+    """A decorator that prints all the returned product_records in a prettified format"""
+    def wrapper(self, *args, **kwargs):
+        products_list: List[Tuple[int, str, float, int, int, int]] = func(self, *args, **kwargs)  #product_list variable is a list of tuples (product_id, name, price, bought, user_id, rating)
+        
+        table = PrettyTable()
+        table.field_names = ["PRODUCT ID", "PRODUCT NAME", "PRICE ($CAD)", "BOUGHT-STATUS", "RATING (/10)"]
+        
+        for product in products_list:
+            product = list(product)
+            product[2] = f"${product[2]:.2f}" #converting the price from a float to a string with a dollar sign in front of it.
+            
+            if product[3] == 1:   #converting the integer version of the 'bought' field to a string. It is more user-friendly
+                product[3] = 'Bought'
+            else:
+                product[3] = 'Unbought'
+                
+            modified_list = list(map(str, product))
+            m_list_sliced = list(modified_list[:4] + [modified_list[-1]])
+            table.add_row(m_list_sliced)
+            
+        print(table)
+    return wrapper
+    
+     
+     
+     
+     
+        
+    
 class Checker:
     """The objects of this class check if certain SQL records exists"""
     def __init__(self, active_user: User):
@@ -68,6 +98,10 @@ class Checker:
     def check_rating(rating: int) -> bool:
         return rating >= 1 and rating <= 10
         
+
+
+
+
 
 class Modifier:
     """The objects of this class are used to modify the database according to the user in-session and their entries"""
@@ -142,11 +176,19 @@ class Modifier:
         product.buy()
         return True
         
-    @print_SQL_records
+    @print_prettified_products_for_user
     def list_products(self, bought: bool = None) -> List[Tuple[int, str, float, int, int, int]]:
         """List the products that are bought (or unbought) by a certain user"""
         product_list = Product.list_products(self.current_user.id, bought)
         return product_list
+    
+    
+    def delete_bought_prods(self) -> bool:
+        """Delete all the bought products of a user"""
+        success = Product.delete_bought_products(int(self.current_user.id))
+        return success
+        
+        
 
     
             

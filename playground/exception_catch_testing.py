@@ -1,4 +1,4 @@
-from exception_raiser import *
+from playground.demo_exception_raiser import *
 
 try:
     example_function()

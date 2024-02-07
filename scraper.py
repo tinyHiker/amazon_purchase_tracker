@@ -14,16 +14,6 @@ from exceptions import *
 #Typing imports
 from typing import Tuple
 
-
-def print_SQL_records(func):
-    """A decorator that print all the return records from a function"""
-    def wrapper(self, *args, **kwargs):
-        records_list = func(self, *args, **kwargs)
-        for record in records_list:
-            str_tuple = tuple(map(str, record))
-            print_string = " ".join(str_tuple)
-            print(print_string)
-    return wrapper
         
 
 class Scraper:
@@ -62,5 +52,19 @@ class Scraper:
         
       
 if __name__ == "__main__":
-    ascii_art = pyfiglet.figlet_format("Amazon Purchase Tracker", font="slant")
+    ascii_art = pyfiglet.figlet_format("Amazon Web Scraper", font="slant")
     print(ascii_art)
+    
+    URL = input("Enter URL of the product you want data on: ")
+    URL = URL.strip()
+    
+    scraper = Scraper()
+    name, price, date = scraper.scrape(URL)
+    print(f"Product name: {name}")
+    print(f"Product price: {price}")
+    print(f"Date registered/viewed: {date}")
+    
+    
+    
+    
+    

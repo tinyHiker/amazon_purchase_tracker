@@ -69,6 +69,24 @@ class Product:
             conn.commit()
             
         return True
+    
+    @staticmethod
+    def delete_bought_products(user_id: int):
+        query = "DELETE FROM products WHERE user_id = ? AND bought = ?"
+        
+        with sqlite3.connect('database.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, (user_id, 1))
+            conn.commit()
+            
+            if cursor.rowcount == 0:
+                raise NoProductsDeleted("You do not have any bought products registered at the moment")
+            
+
+            
+            
+        return True
+        
                 
     
     def change_rating(self, score: int):

@@ -180,6 +180,34 @@ print("-------------------------------------------------------------------------
  
 
 
+#TEST 9: Deleting all the bought products
+#
+print("TEST #9: DELETING ALL THE BOUGHT PRODUCTS", end ="\n\n\n")
+
+print("\n\nVIEWING ALL BOUGHT PRODUCTS BEFORE:", end="\n")
+#Should show only "Gadget"
+modifier.list_products(1)
+print("\n")
+
+modifier.delete_bought_prods()
+
+print("\n\nVIEWING ALL BOUGHT PRODUCTS AFTER:", end="\n")
+#Should show only "Gadget"
+modifier.list_products(1)
+print("\n")
+
+print("\n\nTRYING TO DELETE ALL BOUGHT PRODUCTS WHEN THERE ARE NONE:", end="\n")
+try:
+    modifier.delete_bought_prods()
+except NoProductsDeleted:
+    print("Caught NoProductsDeletedException")
+
+
+print("--------------------------------------------------------------------------------------------------------")
+ 
+
+
+
 
 
 

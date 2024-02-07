@@ -36,4 +36,7 @@ class RatingOutOfBounds(Exception):
         super().__init__(message)
         self.wrong_rating = rating
         
-
+class NoProductsDeleted(Exception):
+    def __init__(self, message: str):
+        super().__init__(message)
+        
