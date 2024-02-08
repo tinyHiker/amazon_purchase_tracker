@@ -1,4 +1,9 @@
+#Internal imports
 from prettytable import PrettyTable
+
+
+#Typing imports
+from typing import List, Tuple
 
 def print_SQL_records(func):
     """A decorator that prints all the return records from a function"""
