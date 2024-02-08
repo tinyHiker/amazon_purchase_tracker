@@ -12,6 +12,8 @@ class AlreadyBought(Exception):
         super().__init__(message)
     
         
+        
+
 class User:
     def __init__(self, id: int, name: str, master: Optional[int] = None):
         self.id = id

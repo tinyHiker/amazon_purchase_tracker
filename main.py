@@ -8,11 +8,13 @@ import smtplib
 import pandas as pd
 import sqlite3
 from prettytable import PrettyTable
+import logging
 
 #Internal imports
 from data_classes import *
 from exceptions import *  #Notice how main.py imports from data_classes but not the other way around to prevent circular imports.
 from scraper import *
+from internal_decorators import *
 
 
 #Typing imports
@@ -22,47 +24,7 @@ from typing import List, Tuple, Optional
 def login(user_name):
     return Checker.extract_user(user_name)
     
-
-def print_SQL_records(func):
-    """A decorator that print all the return records from a function"""
-    def wrapper(self, *args, **kwargs):
-        records_list = func(self, *args, **kwargs)
-        for record in records_list:
-            str_tuple = tuple(map(str, record))
-            print_string = " ".join(str_tuple)
-            print(print_string)
-    return wrapper
-
-
-def print_prettified_products_for_user(func):
-    """A decorator that prints all the returned product_records in a prettified format"""
-    def wrapper(self, *args, **kwargs):
-        products_list: List[Tuple[int, str, float, int, int, int]] = func(self, *args, **kwargs)  #product_list variable is a list of tuples (product_id, name, price, bought, user_id, rating)
-        
-        table = PrettyTable()
-        table.field_names = ["PRODUCT ID", "PRODUCT NAME", "PRICE ($CAD)", "BOUGHT-STATUS", "RATING (/10)"]
-        
-        for product in products_list:
-            product = list(product)
-            product[2] = f"${product[2]:.2f}" #converting the price from a float to a string with a dollar sign in front of it.
-            
-            if product[3] == 1:   #converting the integer version of the 'bought' field to a string. It is more user-friendly
-                product[3] = 'Bought'
-            else:
-                product[3] = 'Unbought'
-                
-            modified_list = list(map(str, product))
-            m_list_sliced = list(modified_list[:4] + [modified_list[-1]])
-            table.add_row(m_list_sliced)
-            
-        print(table)
-    return wrapper
     
-     
-     
-     
-     
-        
     
 class Checker:
     """The objects of this class check if certain SQL records exists"""
@@ -108,7 +70,25 @@ class Modifier:
     
     def __init__(self, active_user: User):
         self.current_user: User = active_user
+        
+        self.logger = logging.getLogger(f"User {self.current_user.id} {self.current_user.name}")
+        self.logger.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(name)s: %(message)s')
+        file_handler = logging.FileHandler('activity.log')
+        file_handler.setFormatter(formatter)
+        self.logger.addHandler(file_handler)
     
+    
+    def log_activity(activity_message):
+        def log_activity_inside(func):
+            def wrapper(self, *args, **kwargs):
+                self.logger.info(f"Ran {func.__name__} with args {args} and kwargs {kwargs}: {activity_message}")
+                result = func(self, *args, **kwargs)
+                return result
+            return wrapper
+        return log_activity_inside
+
+    @log_activity("You created a new user")
     def new_user(self, username: str):
         """Creates new user with the current loggedin user as the master"""
         try:
@@ -133,7 +113,7 @@ class Modifier:
         product: Product = Product.create_new(name, final_price, today, self.current_user, rating)
         return True
     
-    
+    @log_activity("You entered a new product")
     def enter_new_product(self, URL : str, rating: int) -> bool:
         if not Checker.check_rating(rating):
             raise RatingOutOfBounds(rating)
@@ -142,7 +122,7 @@ class Modifier:
         self.enter_SQL_product(name = scraped_data[0], final_price = scraped_data[1], today = scraped_data[2], rating = rating)
         return True
         
-        
+    @log_activity("You found a product")
     def find_product(self, product_code: int) -> Product: #If this one does not return product then it raises a ProductDoesNotExist Exception
         """Takes a product code and returns a product object"""
         query = "SELECT * FROM products WHERE id = ?"
@@ -158,18 +138,22 @@ class Modifier:
             result = results[0]
             return Product(*result)
         
+        
+    @log_activity("You deleted a product")
     def delete_product(self, product_code : int) -> bool:
         """Finds product using find_product() method and then calls delete() method on the returned product object"""
         product: Product = self.find_product(product_code)
         product.delete()
         return True
-        
+    
+    @log_activity("You changed a product rating")
     def change_rating(self, product_code : int, new_rating : int) -> bool:
         """Finds product using find_product() method and the calls new_rating() on the returned product object"""
         product: Product = self.find_product(product_code)
         product.change_rating(new_rating)
         return True
-        
+    
+    @log_activity("You bought a product")
     def buy(self, product_code: int) -> bool:
         """Finds product using find_product() method and then calls buy() method on the returned product object"""
         product: Product = self.find_product(product_code)
@@ -182,7 +166,7 @@ class Modifier:
         product_list = Product.list_products(self.current_user.id, bought)
         return product_list
     
-    
+    @log_activity("You cleansed the palet")
     def delete_bought_prods(self) -> bool:
         """Delete all the bought products of a user"""
         success = Product.delete_bought_products(int(self.current_user.id))

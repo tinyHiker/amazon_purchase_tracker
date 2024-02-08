@@ -4,6 +4,7 @@ REM This is a Windows 10 "batch" file that performs the setup for command line t
 REM First it deleted the database used by the application
 REM Second it recreates the database with only demo-data for testing
 REM Third it runs the command_line_testing python file. This type of testing can ony work with the demo data we entered earlier.
+del /q activity.log
 del /q database.db
 python create_database_for_testing.py
 python command_line_testing.py
