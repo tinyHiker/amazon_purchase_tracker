@@ -207,7 +207,29 @@ except NoProductsDeleted:
 print("--------------------------------------------------------------------------------------------------------")
 
 
-#TEST 10: Delete all products for the user that's logged in functionality. Must check 
+#TEST 10: Delete all products for the user that's logged in functionality. 
+
+print("TEST #10: DELETING ALL THE PRODUCTS", end ="\n\n\n")
+
+print("\n\nVIEWING ALL PRODUCTS BEFORE:", end="\n")
+#Should show only "Gadget"
+modifier.list_products()
+print("\n")
+
+modifier.delete_all_prods()
+
+print("\n\nVIEWING ALL PRODUCTS AFTER:", end="\n")
+#Should show only "Gadget"
+modifier.list_products()
+print("\n")
+
+print("\n\nTRYING TO DELETE ALL PRODUCTS WHEN THERE ARE NONE:", end="\n")
+try:
+    modifier.delete_all_prods()
+except NoProductsDeleted:
+    print("Caught NoProductsDeletedException")
+    
+print("--------------------------------------------------------------------------------------------------------")
 
 
  

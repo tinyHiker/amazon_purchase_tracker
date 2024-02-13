@@ -21,6 +21,10 @@ class User:
         self.master = master
         
         
+    def __str__(self):
+        return f"User #{self.id} {self.name}"
+        
+        
     def create_new_user(self, user_name : str):
         """Creates User in the SQLite3 Database and returns associated User object"""
         query = "INSERT INTO users (name, master) VALUES (?, ?)"
@@ -32,14 +36,33 @@ class User:
             
         return User(id=new_user_id, name=user_name, master=self.id)
             
-    #COMPLETE THIS FUNCTION BY COPYING THE STRCTURE OF PRODUCTS.DELETE_ALL_BOUGHT_PRODUCTS(). MGITH WANT TO MOVE THAN FUNCTION HERE
+    
     def delete_all_products(self):
-        pass
+        query = "DELETE FROM products WHERE user_id = ?"
         
-    ##GOTTA FINISH THIS FUNCTION. THIS FUNCTIO WILL TAKE AN ID AND RETURN THE ASSOCIATED USER OBJECT. THIS WILL BE USED TO INITILIAZED SELF.MASTER WITH A USER OBJECT INSTEAD OF AN INTEGER.
-    #WE WILL CALL THIS METHOD IN TH CONSTRUCTOR TO INITIALIZE self.master.
-    def get_user_from_SQL(self, user_id: int):
-        pass
+        with sqlite3.connect('database.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, (self.id, ))
+            conn.commit()
+            
+            if cursor.rowcount == 0:
+                raise NoProductsDeleted("You do not have any products registered at the moment")
+        return True
+    
+    def delete_bought_products(self):
+        query = "DELETE FROM products WHERE user_id = ? AND bought = ?"
+        
+        with sqlite3.connect('database.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, (self.id, 1))
+            conn.commit()
+            
+            if cursor.rowcount == 0:
+                raise NoProductsDeleted("You do not have any bought products registered at the moment")
+        return True
+        
+        
+    
         
             
         
@@ -53,6 +76,8 @@ class Product:
         self.user_id: int = args[4]
         self.rating: int = args[5] #Should be between 1 and 10 inclusive
     
+    def __str__(self):
+        return f"Product #{self.id} {self.name} PRICE: {self.price} RATING: {self.rating}"
     
     @staticmethod
     def create_new(title: str, final_price: float, date: datetime.date, user: User, rating: int):
@@ -137,4 +162,8 @@ class Product:
             results = cursor.fetchall()
         
         return results
+    
+if __name__ == "__main__":
+    pass
+    
        

@@ -1,7 +1,5 @@
 Do some research of logging
 
-Turn logging to final form. Will use grep to view all user activity. Make viewing all your activity an option in the user-interface.
-Analayze activity to build user_profile
 
 I should be able to dockerize this application pretty easily
 I mean the tutorial deals with pio dependencies, requirements.txt, adding files, and the file you want to run.
