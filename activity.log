@@ -1,5 +1,5 @@
-User 1 Taha: Ran new_user with args ('Joe',) and kwargs {}: You created a new user
-User 1 Taha: Ran new_user with args ('Joe',) and kwargs {}: You created a new user
+User 1 Taha: Ran new_user with args ('Joe',) and kwargs {}: created a new user
+User 1 Taha: Ran new_user with args ('Joe',) and kwargs {}: created a new user
 User 1 Taha: Ran enter_new_product with args ('https://www.amazon.com/Funny-Data-Systems-Business-Analyst/dp/B07FNW9FGJ', 3) and kwargs {}: You entered a new product
 User 1 Taha: Ran enter_new_product with args ('', 11) and kwargs {}: You entered a new product
 User 1 Taha: Ran enter_new_product with args ('https://www.amazon.com/Funny-Data-Systems-Business-Analyst/dp/B07FNW9FGJ', 7) and kwargs {}: You entered a new product

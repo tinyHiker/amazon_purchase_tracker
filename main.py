@@ -10,6 +10,7 @@ import sqlite3
 from prettytable import PrettyTable
 import logging
 
+
 #Internal imports
 from data_classes import *
 from exceptions import *  #Notice how main.py imports from data_classes but not the other way around to prevent circular imports.
@@ -21,18 +22,21 @@ from internal_decorators import *
 from typing import List, Tuple, Optional
 
 
+
 def login(user_name):
     return Checker.extract_user(user_name)
     
     
     
 class Checker:
-    """The objects of this class check if certain SQL records exists"""
+    """The objects of this class check if certain SQL records exists and if certain user inputs are valid"""
     def __init__(self, active_user: User):
         self.current_user: User = active_user
         
+    #def execute_query():
+    
     def check_product_not_visited(self, name: str) -> bool:
-        """Returns True if the active user has already logged this product"""
+        """Returns True if the active user has not already logged this product"""
         with sqlite3.connect('database.db') as conn:  
             cursor = conn.cursor()
             query = "SELECT * FROM products WHERE name = ? AND user_id = ?" #Query to get all products that have a certain name and user_id. Running this query should only return a list of ONE OR ZERO products
@@ -42,9 +46,11 @@ class Checker:
             raise AlreadyBoughtException(results[0][0]) #Passing the id of the already bought product into the exception so that its buy-count can be incremented later on.
         return True
     
+    
     @staticmethod    
     def extract_user(user_name):
-        """During login, used to check for user existence and create and return a new User object is User exists.
+        """During login, used to check for user existence. Will create and return a new User object if User exists.
+        
         During the creation of a new user, used to check for user existence. If user with the same name already exists, we do not execute the create-new-user command"""
         with sqlite3.connect('database.db') as conn:  
             cursor = conn.cursor()
@@ -58,7 +64,8 @@ class Checker:
         
     @staticmethod
     def check_rating(rating: int) -> bool:
-        return rating >= 1 and rating <= 10
+        """Makes sure rating is an integer and is between appropriate range."""
+        return type(rating) == int and rating >= 1 and rating <= 10
         
 
 
@@ -67,10 +74,11 @@ class Checker:
 
 class Modifier:
     """The objects of this class are used to modify the database according to the user in-session and their entries"""
-    
     def __init__(self, active_user: User):
         self.current_user: User = active_user
         
+        
+        #SHOULD PUT ALL THIS IN A SEPERATE FUNCTION
         self.logger = logging.getLogger(f"User {self.current_user.id} {self.current_user.name}")
         self.logger.setLevel(logging.INFO)
         formatter = logging.Formatter('%(name)s: %(message)s')
@@ -80,23 +88,25 @@ class Modifier:
     
     
     def log_activity(activity_message):
+        """This is the decorator that logs every action ever done by any user in the system"""
         def log_activity_inside(func):
             def wrapper(self, *args, **kwargs):
-                self.logger.info(f"Ran {func.__name__} with args {args} and kwargs {kwargs}: {activity_message}")
+                self.logger.info(f"Ran {func.__name__} with args {args} and kwargs {kwargs}: {activity_message}")  #SHOULD ACCESS SELF.CURRENT.USER.NAME etc. to add user-details to the logging
                 result = func(self, *args, **kwargs)
                 return result
             return wrapper
         return log_activity_inside
 
-    @log_activity("You created a new user")
+
+    @log_activity("created a new user")
     def new_user(self, username: str):
-        """Creates new user with the current loggedin user as the master"""
+        """Creates new user with the current loggedin user as the master. Returns the User object of the newly created user"""
+        
         try:
-            Checker.extract_user(username) #Should raise UserDoesNotExist
+            Checker.extract_user(username) #Should raise UserDoesNotExist if user with that username does not exist. This is a good thing
             raise UserAlreadyExists(username)
         except UserDoesNotExist:
-            new_user: User = self.current_user.create_new_user(username) #Creates a new user with the new username if a user with that username does not already exist
-            #Uses a method from the User class and not the Modifier class becuase of 'master' field in SQL
+            new_user: User = self.current_user.create_new_user(username) #Creates a new user. Uses a method from the User class and not the Modifier class becuase of 'master' field in SQL
             return new_user
 
         
@@ -107,24 +117,28 @@ class Modifier:
         return user
         
     
-    def enter_SQL_product(self, name: str, final_price: float, today: datetime.date, rating: int) -> bool: #WE ARE NOT PASSING IN DATE BECUASE THERE IS NOT DATE FIELD IN OUR SLITE DATABASE AT THE MOMENT
+    def enter_SQL_product_record(self, name: str, final_price: float, today: datetime.date, rating: int) -> bool: #WE ARE NOT PASSING IN DATE BECUASE THERE IS NOT DATE FIELD IN OUR SLITE DATABASE AT THE MOMENT
+        """Checks is a product is not visited and then adds it to the SQL database. Returns True is operation completes successfully. Otherwise, raises AlreadyBoughtException"""
         checker = Checker(self.current_user)
         checker.check_product_not_visited(name)
         product: Product = Product.create_new(name, final_price, today, self.current_user, rating)
         return True
     
+    
     @log_activity("You entered a new product")
     def enter_new_product(self, URL : str, rating: int) -> bool:
+        """Takes product-page URL, scrapes data, and then registers the visited product under the name of the current user."""
         if not Checker.check_rating(rating):
             raise RatingOutOfBounds(rating)
         scraper = Scraper()
         scraped_data = scraper.scrape(URL)
-        self.enter_SQL_product(name = scraped_data[0], final_price = scraped_data[1], today = scraped_data[2], rating = rating)
+        self.enter_SQL_product_record(name = scraped_data[0], final_price = scraped_data[1], today = scraped_data[2], rating = rating)
         return True
+        
         
     @log_activity("You found a product")
     def find_product(self, product_code: int) -> Product: #If this one does not return product then it raises a ProductDoesNotExist Exception
-        """Takes a product code and returns a product object"""
+        """Takes a product code and returns the accociated product object."""
         query = "SELECT * FROM products WHERE id = ?"
         
         with sqlite3.connect('database.db') as conn:  # This will create a file named 'database.db'
@@ -169,6 +183,12 @@ class Modifier:
     @log_activity("You cleansed the palet")
     def delete_bought_prods(self) -> bool:
         """Delete all the bought products of a user"""
+        success = Product.delete_bought_products(int(self.current_user.id))
+        return success
+    
+    @log_activity("You cleansed the palet")
+    def delete_all_prods(self) -> bool:
+        """Delete all the products of a user"""
         success = Product.delete_bought_products(int(self.current_user.id))
         return success
         

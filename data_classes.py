@@ -22,6 +22,7 @@ class User:
         
         
     def create_new_user(self, user_name : str):
+        """Creates User in the SQLite3 Database and returns associated User object"""
         query = "INSERT INTO users (name, master) VALUES (?, ?)"
         with sqlite3.connect('database.db') as conn:
             cursor = conn.cursor()
@@ -31,6 +32,14 @@ class User:
             
         return User(id=new_user_id, name=user_name, master=self.id)
             
+    #COMPLETE THIS FUNCTION BY COPYING THE STRCTURE OF PRODUCTS.DELETE_ALL_BOUGHT_PRODUCTS(). MGITH WANT TO MOVE THAN FUNCTION HERE
+    def delete_all_products(self):
+        pass
+        
+    ##GOTTA FINISH THIS FUNCTION. THIS FUNCTIO WILL TAKE AN ID AND RETURN THE ASSOCIATED USER OBJECT. THIS WILL BE USED TO INITILIAZED SELF.MASTER WITH A USER OBJECT INSTEAD OF AN INTEGER.
+    #WE WILL CALL THIS METHOD IN TH CONSTRUCTOR TO INITIALIZE self.master.
+    def get_user_from_SQL(self, user_id: int):
+        pass
         
             
         
@@ -83,10 +92,6 @@ class Product:
             
             if cursor.rowcount == 0:
                 raise NoProductsDeleted("You do not have any bought products registered at the moment")
-            
-
-            
-            
         return True
         
                 

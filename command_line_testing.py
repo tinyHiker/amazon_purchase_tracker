@@ -38,7 +38,7 @@ user = login("Taha")
 print(user)
 print(user.id)
 print(user.name)
-print(user.master)
+print(user.master)  # WILL EVENTUALLY NEED TO UPDATE THIS
 print("\n")
 print("--------------------------------------------------------------------------------------------------------")
 
@@ -180,6 +180,7 @@ print("-------------------------------------------------------------------------
  
 
 
+
 #TEST 9: Deleting all the bought products
 #
 print("TEST #9: DELETING ALL THE BOUGHT PRODUCTS", end ="\n\n\n")
@@ -204,6 +205,11 @@ except NoProductsDeleted:
 
 
 print("--------------------------------------------------------------------------------------------------------")
+
+
+#TEST 10: Delete all products for the user that's logged in functionality. Must check 
+
+
  
 
 
