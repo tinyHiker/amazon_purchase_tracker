@@ -77,7 +77,7 @@ class Product:
         self.rating: int = args[5] #Should be between 1 and 10 inclusive
     
     def __str__(self):
-        return f"Product #{self.id} {self.name} PRICE: {self.price} RATING: {self.rating}"
+        return f"Product #{self.id} {self.name}"
     
     @staticmethod
     def create_new(title: str, final_price: float, date: datetime.date, user: User, rating: int):

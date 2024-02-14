@@ -1,9 +1,8 @@
-Do some research of logging
 
+After this, all main functionality will be done. Proceed to figure out what to do with the file organization problem. I think I should move EVEYRHTING INTO A SEPERATE FOLDER, 
+THEN PUT OLY THE MAIN SYSTEMS NECESSARY PARTS INTO THE MAIN FOLDER.
+FOr the main-system, we don't need command_line_testing.py, the batch script or view_database and the create_database_for_testing files
 
-I should be able to dockerize this application pretty easily
-I mean the tutorial deals with pio dependencies, requirements.txt, adding files, and the file you want to run.
-That's all I have in my application, right?
 
 keep cmd-testing until you finish the system. Eventually, though, you will have to ditch it. MAKE A COMMIT BEFORE DITCHING IT FOR THE FINAL SYSTEM AND THE FINAL DATABASE. MIGHT BE A BRANCH POINT IN THE FUTURE
 

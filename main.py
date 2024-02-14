@@ -33,8 +33,8 @@ class Checker:
     def __init__(self, active_user: User):
         self.current_user: User = active_user
         
+        
 
-    
     @staticmethod
     def execute_query(query: str, arguments):
         """Executes an SQL query on database.db with specified arguments. Returns results of the query in Tuple Form"""
@@ -45,6 +45,7 @@ class Checker:
         return results
     
     
+    
     def check_product_not_visited(self, name: str) -> bool:
         """Returns True if the active user has not already logged this product"""
         query = "SELECT * FROM products WHERE name = ? AND user_id = ?" #Query to get all products that have a certain name and user_id. Running this query should only return a list of ONE OR ZERO products
@@ -53,6 +54,7 @@ class Checker:
         if len(results) > 0:
             raise AlreadyBoughtException(results[0][0]) #Passing the id of the already bought product into the exception so that its buy-count can be incremented later on.
         return True
+    
     
     
     @staticmethod    
@@ -68,11 +70,14 @@ class Checker:
         else:
             return Modifier.create_user_object(results[0][0], results[0][1], results[0][2])
         
+        
+        
     @staticmethod
     def check_rating(rating: int) -> bool:
         """Makes sure rating is an integer and is between appropriate range."""
         return type(rating) == int and rating >= 1 and rating <= 10
         
+
 
 
 
@@ -88,12 +93,11 @@ class Modifier:
     def create_logger(self, user_id: int, user_name: str):
         self.logger = logging.getLogger(f"User {user_id} {user_name}")
         self.logger.setLevel(logging.INFO)
-        formatter = logging.Formatter('%(asctime)s - %(message)s')
+        formatter = logging.Formatter('%(message)s')
         file_handler = logging.FileHandler('activity.log')
         file_handler.setFormatter(formatter)
         self.logger.addHandler(file_handler)
         
-    
     
     def log_activity(activity_message):
         """This is the decorator that logs every action ever done by any user in the system"""
@@ -101,18 +105,23 @@ class Modifier:
             def wrapper(self, *args, **kwargs):
                 user_name = self.current_user.name
                 user_id = self.current_user.id
+                now = datetime.datetime.now()
+                friendly_format = now.strftime("%Y-%m-%d %H:%M:%S")
+                
                 
                 result = func(self, *args, **kwargs)
+                
                 if result is not None:
-                    new_logger_string = f"User #{user_id} ({user_name}) {activity_message} {str(result)}"
+                    new_logger_string = f"At time {friendly_format}, {user_name} (#{user_id}) {activity_message} {str(result)}."
                 else:
-                    new_logger_string = f"User #{user_id} ({user_name}) {activity_message}"
+                    new_logger_string = f"At time {friendly_format}, {user_name} (#{user_id}) {activity_message}."
                 #old_logger_string = f"User #{user_id} ({user_name}) ran {func.__name__} with args {args} and kwargs {kwargs}: {user_name} {activity_message}"
                 
                 self.logger.info(new_logger_string)  
                 return result
             return wrapper
         return log_activity_inside
+
 
 
     @log_activity("created a new user: ")
@@ -133,6 +142,7 @@ class Modifier:
         user = User(user_id, user_name, user_master)
         return user
         
+        
     
     def enter_SQL_product_record(self, name: str, final_price: float, today: datetime.date, rating: int) -> Product: #WE ARE NOT PASSING IN DATE BECUASE THERE IS NOT DATE FIELD IN OUR SLITE DATABASE AT THE MOMENT
         """Checks is a product is not visited and then adds it to the SQL database. Returns reference to Product if operation completes successfully. Otherwise, raises AlreadyBoughtException"""
@@ -140,6 +150,7 @@ class Modifier:
         checker.check_product_not_visited(name)
         product: Product = Product.create_new(name, final_price, today, self.current_user, rating)
         return product
+    
     
     
     @log_activity("entered a new product: ")
@@ -151,6 +162,7 @@ class Modifier:
         scraped_data = scraper.scrape(URL)
         product = self.enter_SQL_product_record(name = scraped_data[0], final_price = scraped_data[1], today = scraped_data[2], rating = rating)
         return product
+        
         
         
     @log_activity("found a product: ")
@@ -170,6 +182,7 @@ class Modifier:
             return Product(*result)
         
         
+        
     @log_activity("deleted a product: ")
     def delete_product(self, product_code : int) -> Product:
         """Finds product using find_product() method and then calls delete() method on the returned product object"""
@@ -177,6 +190,8 @@ class Modifier:
         product.delete()
         return product
     
+    
+
     @log_activity("changed a products rating: ")
     def change_rating(self, product_code : int, new_rating : int) -> Product:
         """Finds product using find_product() method and the calls new_rating() on the returned product object"""
@@ -192,11 +207,14 @@ class Modifier:
         return product
         
     
+    
     @print_prettified_products_for_user
     def list_products(self, bought: bool = None) -> List[Tuple[int, str, float, int, int, int]]:
         """List the products that are bought (or unbought) by a certain user"""
         product_list = Product.list_products(self.current_user.id, bought)
         return product_list
+    
+    
     
     @log_activity("deleted all bought products from the registry")
     def delete_bought_prods(self) -> bool:
@@ -205,11 +223,28 @@ class Modifier:
         self.current_user.delete_bought_products()
         
         
+        
     @log_activity("deleted all recorded products")
     def delete_all_prods(self) -> None:
         """Delete all the products of a user"""
         #success = Product.delete_bought_products(int(self.current_user.id))
         self.current_user.delete_all_products()
+        
+        
+        
+    def get_history(self):
+        """This function prints the entire activity history of the user"""
+        import subprocess
+        
+        arguments = [self.current_user.name]
+        command = ["python", "-u", "view_user.py"] + arguments
+        result = subprocess.run(command, capture_output=True, text=True)
+        
+        if result.returncode == 0:
+            print(result.stdout)
+        else:
+            print("Error running script:")
+            print(result.stderr)
         
 
     

@@ -1,9 +1,9 @@
-2024-02-13 13:56:19,146 - User #1 (Taha) created a new user:  User #2 Joe
-2024-02-13 13:56:19,734 - User #1 (Taha) entered a new product:  Product #3 Funny Got Data MIS Data Systems Business Analyst T-Shirt PRICE: 19.99 RATING: 3
-2024-02-13 13:56:20,240 - User #1 (Taha) found a product:  Product #3 Funny Got Data MIS Data Systems Business Analyst T-Shirt PRICE: 19.99 RATING: 3
-2024-02-13 13:56:20,242 - User #1 (Taha) found a product:  Product #3 Funny Got Data MIS Data Systems Business Analyst T-Shirt PRICE: 19.99 RATING: 3
-2024-02-13 13:56:20,255 - User #1 (Taha) deleted a product:  Product #3 Funny Got Data MIS Data Systems Business Analyst T-Shirt PRICE: 19.99 RATING: 3
-2024-02-13 13:56:20,268 - User #1 (Taha) found a product:  Product #1 Widget PRICE: 19.99 RATING: 8
-2024-02-13 13:56:20,279 - User #1 (Taha) changed a products rating:  Product #1 Widget PRICE: 19.99 RATING: 2
-2024-02-13 13:56:20,312 - User #1 (Taha) deleted all bought products from the registry
-2024-02-13 13:56:20,339 - User #1 (Taha) deleted all recorded products
+At time 2024-02-14 12:28:46, Taha (#1) created a new user:  User #2 Joe.
+At time 2024-02-14 12:28:46, Taha (#1) entered a new product:  Product #3 Funny Got Data MIS Data Systems Business Analyst T-Shirt.
+At time 2024-02-14 12:28:47, Taha (#1) found a product:  Product #3 Funny Got Data MIS Data Systems Business Analyst T-Shirt.
+At time 2024-02-14 12:28:47, Taha (#1) found a product:  Product #3 Funny Got Data MIS Data Systems Business Analyst T-Shirt.
+At time 2024-02-14 12:28:47, Taha (#1) deleted a product:  Product #3 Funny Got Data MIS Data Systems Business Analyst T-Shirt.
+At time 2024-02-14 12:28:47, Taha (#1) found a product:  Product #1 Widget.
+At time 2024-02-14 12:28:47, Taha (#1) changed a products rating:  Product #1 Widget.
+At time 2024-02-14 12:28:47, Taha (#1) deleted all bought products from the registry.
+At time 2024-02-14 12:28:47, Taha (#1) deleted all recorded products.

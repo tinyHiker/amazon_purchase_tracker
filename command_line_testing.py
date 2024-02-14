@@ -232,7 +232,15 @@ except NoProductsDeleted:
 print("--------------------------------------------------------------------------------------------------------")
 
 
- 
+#TEST 11: Delete all products for the user that's logged in functionality. 
+
+print("TEST #11: VIEW HISTORY", end ="\n\n\n")
+
+modifier.get_history()
+
+print("\n\n")
+    
+print("--------------------------------------------------------------------------------------------------------")
 
 
 
